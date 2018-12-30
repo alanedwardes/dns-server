@@ -6,6 +6,6 @@ ADD . /opt/dns-server
 
 RUN dotnet publish /opt/dns-server --configuration Release --runtime linux-x64
 
-VOLUME ["/data"]
+EXPOSE 53:53/udp
 
 ENTRYPOINT ["/opt/dns-server/bin/Release/netcoreapp2.1/linux-x64/publish/dns-server"]
