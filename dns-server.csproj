@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.16" />
     <PackageReference Include="DNS" Version="5.0.0" />
   </ItemGroup>
 
