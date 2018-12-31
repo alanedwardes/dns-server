@@ -54,6 +54,9 @@ namespace DnsServerConsole
                 }, new Dictionary<string, AttributeValueUpdate>
                 {
                     { "Count", new AttributeValueUpdate { Action = "ADD", Value = new AttributeValue { N = "1" } } },
+                    { "Year", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy")) } },
+                    { "Month", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy-MM")) } },
+                    { "Date", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy-MM-dd")) } },
                     { "Expiry", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue { N = DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds().ToString() } } }
                 }));
             }
