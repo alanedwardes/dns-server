@@ -44,17 +44,25 @@ namespace DnsServerConsole
         {
             foreach (var question in request.Questions)
             {
-                await amazonDynamoDb.UpdateItemAsync(new UpdateItemRequest("DnsRequests", new Dictionary<string, AttributeValue>
+                try
                 {
-                    { "RequestId", new AttributeValue(question.Name.ToString()) }
-                }, new Dictionary<string, AttributeValueUpdate>
+                    await amazonDynamoDb.UpdateItemAsync(new UpdateItemRequest("DnsRequests", new Dictionary<string, AttributeValue>
+                    {
+                        { "RequestId", new AttributeValue(question.Name.ToString()) }
+                    }, new Dictionary<string, AttributeValueUpdate>
+                    {
+                        { "Count", new AttributeValueUpdate { Action = "ADD", Value = new AttributeValue { N = "1" } } },
+                        { "CurrentYear", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy")) } },
+                        { "CurrentMonth", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy-MM")) } },
+                        { "CurrentDate", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy-MM-dd")) } },
+                        { "Expiry", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue { N = DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds().ToString() } } }
+                    }));
+                }
+                catch (Exception e)
                 {
-                    { "Count", new AttributeValueUpdate { Action = "ADD", Value = new AttributeValue { N = "1" } } },
-                    { "CurrentYear", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy")) } },
-                    { "CurrentMonth", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy-MM")) } },
-                    { "CurrentDate", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue(DateTime.UtcNow.ToString("yyyy-MM-dd")) } },
-                    { "Expiry", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue { N = DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds().ToString() } } }
-                }));
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
     }
