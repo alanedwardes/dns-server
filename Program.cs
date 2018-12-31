@@ -48,30 +48,14 @@ namespace DnsServerConsole
 
             foreach (var question in request.Questions)
             {
-                requests.Add(new PutRequest
+                var response = await amazonDynamoDb.UpdateItemAsync(new UpdateItemRequest("DnsRequests", new Dictionary<string, AttributeValue>
                 {
-                    Item = new Dictionary<string, AttributeValue>
-                    {
-                        { "RequestId", new AttributeValue(requestId) },
-                        { "Name", new AttributeValue(question.Name.ToString()) },
-                        { "Expiry", new AttributeValue { N = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds().ToString() } }
-                    }
-                });
-            }
-
-            try
-            {
-                await amazonDynamoDb.BatchWriteItemAsync(new BatchWriteItemRequest
+                    { "RequestId", new AttributeValue(question.Name.ToString()) }
+                }, new Dictionary<string, AttributeValueUpdate>
                 {
-                    RequestItems = new Dictionary<string, List<WriteRequest>>
-                    {
-                        { "DnsRequests", requests.Select(x => new WriteRequest(x)).ToList()}
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
+                    { "Count", new AttributeValueUpdate { Action = "ADD", Value = new AttributeValue { N = "1" } } },
+                    { "Expiry", new AttributeValueUpdate { Action = "PUT", Value = new AttributeValue { N = DateTimeOffset.UtcNow.AddDays(30).ToUnixTimeSeconds().ToString() } } }
+                }));
             }
         }
     }
