@@ -42,13 +42,9 @@ namespace DnsServerConsole
 
         public static async Task PersistRequest(IRequest request)
         {
-            var requestId = Guid.NewGuid().ToString();
-
-            var requests = new List<PutRequest>();
-
             foreach (var question in request.Questions)
             {
-                var response = await amazonDynamoDb.UpdateItemAsync(new UpdateItemRequest("DnsRequests", new Dictionary<string, AttributeValue>
+                await amazonDynamoDb.UpdateItemAsync(new UpdateItemRequest("DnsRequests", new Dictionary<string, AttributeValue>
                 {
                     { "RequestId", new AttributeValue(question.Name.ToString()) }
                 }, new Dictionary<string, AttributeValueUpdate>
